@@ -1,0 +1,39 @@
+On Ansible Windows Control Machine 
+
+
+1. Install-Module -Name winrm -Force -SkipPublisherCheck
+2. winrm quickconfig -q
+3. Set-Service -Name winrm -StartupType Automatic
+4. New-NetFirewallRule -Name winrm -DisplayName 'Windows Remote Management (HTTP-In)' -Enabled True -Direction Inbound -Protocol TCP -LocalPort 5985
+5. Restart-Service winrm
+
+
+
+
+create inventory file 
+
+[windows]
+windows-host ansible_host=192.168.1.2 ansible_user=Administrator ansible_password=YourPassword ansible_connection=winrm ansible_winrm_server_cert_validation=ignore
+
+
+
+install required python module 
+
+pip install "pywinrm>=0.3.0"
+
+
+
+run ansible commands 
+
+ansible windows-host -i inventory.ini -m win_shell -a "ipconfig"
+
+
+==========================================================================================================================================================
+
+On Ansible Windows host machine
+
+1. Enable-PSRemoting -Force
+2. Set-Service -Name winrm -StartupType Automatic
+3. New-NetFirewallRule -Name winrm -DisplayName 'Windows Remote Management (HTTP-In)' -Enabled True -Direction Inbound -Protocol TCP -LocalPort 5985
+4. Restart-Service winrm
+

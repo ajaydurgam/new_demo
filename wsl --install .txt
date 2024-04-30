@@ -1,0 +1,5 @@
+wsl --install 
+
+wsl --status 
+
+wsl -d --install Ubuntu

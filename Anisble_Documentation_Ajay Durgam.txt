@@ -1,0 +1,465 @@
+Anisble (Configuration Management tool) --> Open source management tool --> managed by Redhat Linux --> Automation tool 
+
+
+--> Ansible was written in python 
+
+--> Ansible has one Master node and any no of Slave nodes
+
+--> The connection between Master and Slave node is done through SSH
+
+--> Ansible is a Push based 
+
+--> other than ansible we have more tools like "Puppet" and "Chef" but these are pull based 
+
+--> Here the Automation of servers was done through the scripting manually using YAML file.
+
+--> Ansible uses this file information from master configures agent on the server periodically .
+
+-->Ip address of the slave nodes has to be given in the master nodes inventory .
+
+
+===============================================================================================================
+
+
+Demo Task -> 1
+
+
+1. launch three ubuntu instances having volume type - 20.04 
+
+2. select instance type t2.xlarge
+
+3. storage configuration of -> 1 x 30 gb
+
+4. in security group have the allow all traffic from all ports 
+
+5. now launch instance 
+
+6. name the instances as Master, target1, target2
+
+7. connect with the putty 
+
+8. ubuntu root user for login is "ubuntu"
+
+9. enter --> sudo su (to use as ubuntu user from the root user)
+
+==> now here create a file under --> vi /tmp/jenkins.pem(name as keypair name which is used in creation of instance)
+
+under this pem file copy paste the data  of .pem file used in  the instance
+
+==> give the permissions to the file -->chmod 700 /tmp/jenkins-demosudan.pem
+
+
+
+10. now check for the --> "updates sudo apt update"
+
+11. sudo apt install ansible 
+
+11.1 at the time when we install ansible, python is automatically installed 
+
+12. check the ansible version using --> anisble --version
+
+13. here we have the config file --> copy the path & open the path --> vi /etc/ansible/ansible.cfg
+
+14. here we have the inventory, forks,...,
+
+forks--> the forks are used to check the connection in "n" no of times mentioned in forks ==> this connection is between the "master" and "slave".
+
+--> under the inventory we have hosts there we will assign the private ip's of the target nodes to the master's host --> /etc/ansible/hosts
+
+15. SSH default port --> 22
+
+16. under the --> vi /etc/ansible/hosts
+
+
+here we have groups name --> webservers
+
+db servers 
+
+
+if we have the 10 target nodes but we have to install some application under first 5 target nodes then
+
+ we will assign the these 5 target nodes private ip address to the webserver 
+
+other 5 target nodes we use under db server so when ever we need we use it as db server or webserver
+
+
+17. we will have a directory to create a own invenotory file inside it -->mkdir ajay
+
+17.1 cd ajay
+
+17.2 
+
+===>  vi myinventory 
+t1 ansible_host=172.31.92.53
+t2 ansible_host=172.31.88.119
+
+ 
+
+[webservers]
+t1
+t2
+
+ 
+
+[allservers:children]
+webservers
+
+ 
+
+[allservers:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=/tmp/jenkins-demo.pem
+
+esc:wq!(enter) to save the file
+
+18.here we create a one more file to use our own inventory file as a default inventory file 
+
+[defaults]
+
+inventory = ./myinventory
+
+
+esc:wq!(enter) to save the file
+
+
+
+19.ansible all(here we can use the target node ip address or t1 or we can use the no of target nodes directly by giving webserver or db server) -m ping 
+
+
+-->ansible all -m ping 
+
+-->click yes
+ 
+instead of using yes we can use "-o" in the command  --> ansible all -m ping -o
+
+
+20. now the connection was success with the master and target now we use commands to install httpd, git in the target nodes 
+
+
+--> ansible all -m apt -a "name=httpd status=present" --become (--become is used as root user for installation)
+
+
+--> -m ==> module 
+
+--> -a ==> argument 
+
+--> apt ==> to install 
+
+--> status ==> present(means installation)
+
+--> status ==> absent(means deletion)
+
+
+
+
+21. --> ansible all -m apt -a "name=git status=present" --become 
+
+
+--> after executing the command check the "git --version " in the target to know wether the git has installed --> git version will be shown
+
+
+22. --> ansible all -m apt -a "name=httpd status=absent" --become
+
+
+-->  after executing the command check the "git --version " in the target to know wether the git has installed --> if git is already there it will be deleted
+
+
+23. ansible all -m shell -a date 
+
+--> shell ==> is a module 
+
+
+by using  this command we can check the configurations done using the master.
+
+
+
+
+========================================================================================================================================================
+
+
+
+for directly using the default inventory we have to get into the hosts file there we have to paste the private ip address of target nodes
+
+
+
+--> open the hosts file ==> vi /etc/ansible/hosts
+
+here paste the private ip adress at first line by using enter 
+
+
+
+
+==> command -->(private ip address) ansible user=ubuntu ansible_connection=ssh ansible_ssh_private_key_file=/tmp/jenkins.pem
+
+
+use same command until the required no of target nodes are used 
+
+
+
+---> to check wether it is pinging or not is ==> ansible all -m ping -o
+
+or click yes
+
+
+
+--> if any of the target node is not pinging use the ip separetly to ping 
+
+ex: ansible private ip address -m ping (to ping the particular target node)
+
+
+
+--> now install git using the master in the target nodes 
+
+
+===> ansible all -m apt -a "name=git status=present" --become
+
+
+==================================================================================================================
+
+
+We are creating a file to transfer it into the target node 
+
+
+-->touch sachin 
+
+--> ls
+
+--> pwd 
+
+--> ansible all -m copy -a "src=/home/ubuntu/sachin dest=/home/ubuntu" --become 
+
+==> all(here we can give single ip address of target node to copy into particular target)
+
+succesfully copied the file to the target machine
+
+
+
+======================================================================================================================
+
+
+**********Playbooks**********
+
+
+
+--> under the yml file we will create these playbooks 
+
+
+--> create a yml file ==> vi ping.yml
+
+
+ --- (its a divider for task one,two, three)
+ - host: all
+   gather_focus: yes
+   remote_user: ubuntu
+   tasks:
+   - name: Test connection (it is for just the ping connection)
+     ping:
+     remote_user: ubuntu
+
+
+esc:wq!(enter) to save file
+
+
+
+--> ansible-playbook ping.yml --syntax-check  <== 
+
+
+--syntax-check(it shows the playbook is correct position or not)
+
+
+
+
+================================================================================================================
+
+
+
+                      **********YAML FILES**************
+
+
+Yaml file is used to represent configuration data
+
+
+Key Value data separated by ":"
+
+
+
+indentation should be clear in Yaml files
+
+
+Yaml file representations
+
+dictionary in another dictionary 
+
+lists
+
+
+In Yaml file dictionaries doesn't need order but in arraylist order must be same in yaml file
+
+
+
+==========================================================================================================================
+
+
+
+                                     ************Playbooks*************
+
+
+--> Run simple commands on target1 using master playbook
+
+--> resarting target1 also done using playbooks,...etc
+
+--> deploy 50 vm's on public cloud 
+
+--> provision storage to all vm's
+
+--> configuring web server to all ip's
+
+--> set up cluster configuration 
+
+
+these all and many more can be done using the playbooks.
+
+
+
+===> playbook --> is a single yamlfile 
+
+    
+     play --> defines set of activities (tasks) to be run on hosts(targets)
+
+
+      tasks --> 1.execute a command 
+
+                2.run a script 
+
+                3.install a package
+
+                4.shutdown/restart
+
+
+
+     
+playbook divided into two set of dictionaries 
+
+
+every dictinoary has a --> 1.name
+
+                           2.hosts
+
+                           3.tasks (it is in list form its a ordered collection)
+
+    
+
+modules are the different tasks done in yaml ex: command ,service ,yum ,shell
+
+
+
+if we have a file in master node  the by using the modules 
+
+
+==> ansible all -m ping(here ping is the module) -i(to specify inventory file)  inventory.txt
+
+we can connect it to the target nodes
+
+
+
+Playbook creation 
+
+
+--> vi playbook.yml
+
+        
+
+  - 
+     name: test connectivity to target server
+     hosts: all
+     tasks: 
+       - name: ping test
+         ping:
+
+
+esc:wq!(enter) to save file
+
+
+--> ansible-playbook playbook.yml -i inventory.txt
+
+
+
+                         ***********Modules***********
+
+System level modules 
+
+
+==> command modules--> used to execute commands 
+
+==> file--> modules used to copy replace many more 
+
+==> db--> modules used to add remove modify databases
+
+==> cloud--> modules have for amazon,docker, azure ,google,vmware manymore.
+
+==> windows--> modules used to operate in windows environment
+
+and have manymore modules 
+
+
+
+In Ansible handlers are used to restart the application or a software or a tool 
+
+handlers:
+  name: restart a application-service 
+  service:
+    name: nginx
+    state: restarted
+
+
+
+
+name: to print the output 
+debug: 
+  name: give the variable name to print output when the playbook runs
+
+
+
+
+roles are use to reusable to code 
+
+hosts: all
+name: install my sql server
+roles:
+    - mysql
+
+
+ansible-galaxy init mysql 
+
+so this will initialize a role with the rquired files in mysql 
+
+mysql --> 1.README.md
+          2.templates
+	  3.tasks
+	  4.handlers
+	  5.vars
+	  6.defaults
+	  7.meta
+            
+by the two methods we can verify 
+
+ansible-playbook playbook.yml --syntax-check (it only checks the syntax)
+
+ansible-playbook playbook.yml --check (it checks for the error when we run a playbook)
+
+ansible-playbook playbook.yml --diff (it shows the diff between before and after the playbook runs)
+
+ansible-lint playbook.yml (gives the indentation errors)
+
+
+
+try galaxy.ansible.com
+
+
+
+
+
+
+
+
+

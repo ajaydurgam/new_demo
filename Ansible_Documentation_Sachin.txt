@@ -1,0 +1,184 @@
+mWhat is ansible?
+A. Ansible® is an open source IT automation tool that automates provisioning, configuration management, application deployment, orchestration, and many other manual IT processes. Unlike more simplistic management tools, Ansible users (like system administrators, developers and architects) can use Ansible automation to install software, automate daily tasks, provision infrastructure, improve security and compliance, patch systems, and share automation across the entire organization.
+
+How Ansible works?
+Ansible works by connecting to what you want automated and pushing programs that execute instructions that would have been done manually. These programs utilize Ansible modules that are written based on the specific expectations of the endpoint’s connectivity, interface, and commands. Ansible then executes these modules (over standard SSH by default), and removes them when finished (if applicable).
+
+There are no additional servers, daemons, or databases required. Typically you'll work with your favorite terminal program, a text editor, and a version control system to keep track of changes to your content. 
+
+What is an Ansible playbook?
+An Ansible playbook is a blueprint of automation tasks—which are complex IT actions executed with no need for human involvement. Ansible playbooks are written in human-readable YAML format and executed on a set, group, or classification of hosts, which together make up an Ansible inventory.
+
+
+-->we have one master and two nodes(node1,node2)
+
+--IN Master we will install asible but in nodes we wont do anything, through ansible we ill install all the applications in nodes.
+--Master:
+-we need to install asinle and pip3 pacakages.
+-in master create a user:useradd ansibleuser, 
+-in master create a password:passwd ansibleuser(password for anisbleuser)
+-visudo for user: visudo-->
+includedir /etc/sudoers.d
+ansibleuser ALL=(ALL)  NOPASSWD: ALL
+
+-su ansibleuser----enter into ansible user
+-how to do password authentication-----cd /etc/ssh---> vi sshd_config----> type- /password---> un-comment passwordauthentication yes and comment passwordauthentication no---> and save it.
+--->do same has in nodes(node1,node2)password authentication & sudo access
+-----How to connect Master to Nodes with the help of SSH keys.
+-----In Master login to asible user---> how to check hidden file and folders-->ls -la---->ssh-keygen--->ls -la will find the ssh key--->cd .ssh
+ls -lrt to see private and pubild key--->we need to copy master ssh public&private key's in nodes--->exit-->systemctl restart sshd--->in all nodes to we have to do--->su -ansibleuser--->ssh-copy-id node1 node2--->
+
+Inventory:
+--------
+Master--->cd /etc/ansible--->vi host---->and past the IP address of node's(1,2)--->and save it--->now test the node's it's working or not--->ansible all -m ping--->can we change hostfile name--->yes we can do it--->and aslo we can copy ansible.cfg file and we can work on it--->cd ansible--->vi ansible.cfg--->
+inventory = /home/andibleuser/inventory--->save it--->ansible all -m ping----> touch /home/ansibleuser/inventory---->vi /home/ansibleuser/inventory and copy node ip address--->save it---->ls -lrt----> cp ansible.cfg /home/ansibleuser/---->vi /home/ansibleuser---->and remove the inventory line--->ls -lrt---> ansible all -m ping----->
+
+What is ansible configuration?
+
+A. it is ansible engine----connect to storage,linux,windows,docker container,networks,cloud,podman--->ansible is push mechanism---->ansible to linux Engin(interpetter)---->python--->ansible to windows(interpetter)---->powershell& .net(V4)
+--->ansible to networks,cloud, docker container---->it will only push commands--->and code allways lies in Asible engin---->coming to ansible to linux or windows---> will push codes also--->cloud.network,container is devices---->windows&linux are OS---->
+
+----->Asible Engin is controls nodes and windows,linux,storage,cloud,networks,container is mange nodes.
+----controls nodes will connect to manges nodes with the help of inventory's(remote,host).
+
+What is Playbooks?
+A. it is yaml file and it will have sequence of place(sequence of task).
+What is task?
+A. Action plan's we call as modules()
+
+Task?
+
+we pull the required pacakages.
+- required pacakge (install)
+- required configuration.
+- restart the service.
+- all the service in fier wall.
+
+How to install ansible in Centos 8?
+A. 
+-Yum update.
+-install epel packages.
+-yum install ansible.
+-ansible --version.
+-python3 --version
+-inanother way to install ansible with the help of pip.
+--->cd /etc/ansible---->ls -lrt---->--------
+Master--->cd /etc/ansible--->vi host---->and past the IP address of node's(1,2)--->and save it--->now test the node's it's working or not--->ansible all -m ping--->can we change hostfile name--->yes we can do it--->and aslo we can copy ansible.cfg file and we can work on it--->cd ansible--->vi ansible.cfg--->
+inventory = /home/andibleuser/inventory--->save it--->ansible all -m ping----> touch /home/ansibleuser/inventory---->vi /home/ansibleuser/inventory and copy node ip address--->save it---->ls -lrt----> cp ansible.cfg /home/ansibleuser/---->vi /home/ansibleuser---->and remove the inventory line--->ls -lrt---> ansible all -m ping----->
+
+
+Ansible engin architecture?
+
+A.--ansible engin will have inventory,API,modules,plugins.
+
+usecase of ansible?
+- configuration management 
+- application deployment
+- provising
+- CD with ansible
+- security
+- orchestration
+- https://www.ansible.com/overview/how-ansible-works ------>how ansible usecase works
+
+Ansible base structure?
+
+- Module---->libray files
+- conditions
+- actually commands
+----->curret stage is mange host
+----->desire stage is control host which in ansible playbook
+
+What is inventory?
+A.
+-static inventory
+-Dynamic inventory
+----> default location is /ect----->we wont work in realytime(1. if we want to acess /etc/ansible we need to root acessand 2.we wont have root acess in realy time)
+----->/etc/ansible/hosts is a golbel file.
+----->vi /etc/ansible/host----->
+
+[linuxserver]
+server[a:b]
+
+[web]
+192.168.250.[1:100]
+
+[db]
+192.168.[250:252].[1:100]
+
+----->to see  ansible --list-hosts web
+----->        ansible --list-hosts linuxserver
+----->        ansible --list-hosts db
+-----> how to check 100 groups(praent group,child group)---->ansible-inventory --graph
+
+
+---->In Production we use project base file--->we have create own project and we need to create own inventory
+mkdir ansible--->cd ansble--->vi inventory(own inventory files)----->
+-server
+
+[web]
+
+server[b:c]
+172.25.150.[1:5]
+
+[db]
+server[c:d]
+
+[India_dc:childer]
+web
+db
+save it
+---->ansible-inventory -graph -i inventory----->which i have create inventory file
+
+Configuration files?
+A. Is a asible.cfg---->we have two session---->1. default 2.privilage_escalation
+
+Dfault session---->default setting and also mention remote user's
+Privalage_escalation----> How ansible run in mange hosts
+
+
+/etc/ansible/ansible.cfg---->is a default location
+
+
+When we create a user and user name is ansible 
+---cd ansibleuser--->vi ~/.ansible.cfg and then inventory will take from here--->
+[defaults]
+inventory = ./inventory----->save it----> ansible ---version---> it will show /root/.ansible.cfg
+
+---->export ANSIBLE_CONFIG=/tmp/ansible.cfg----------->/tmp/ansible.cfg is a file coping ally ansible progaram in /tmp/ansiblr.cfg
+
+How to find all the module's?
+A. ansible-doc -l
+How to see the count of modules?
+A. ansible-doc -l | wc -l
+How to see windows module's?
+A. ansible-doc -l | grep ^win_
+
+
+What is Adhoc commands?
+
+---->ansible host -m module [-a-argument] [-i-inventory]
+---->ansible all -m user -a "name=sanjay"
+---->we need to have the ansible.cfgfile and inventory file to above command.
+---->how to check user created or not----> ansible all -m command -a "id sanjay"
+----> ansible modules are ideimportant---->like when you run it again it wont change it will get success
+How to remove a user?
+----> ansible all -m user -a 'name=india state=absent'
+
+How to start services in control node which manges nodes connect with control node?
+------> ansible all -m -a "name=ssh state=start"
+
+How to re-boot the nodes
+---> ansible all -m command -a "/sbin/reboot -t now"
+
+How to copy form master node to mange nodes?
+---> ansible mangesnode-name -m copy -a 'content="hi sanjay" dest=/etc/motd'
+
+How to check wheather copy has been done or not in mangae node's?
+--->ansible mangesnode-name -m shell  -a 'cat /etc/motd'
+
+
+If you want to install python in manage node?
+----->ansible -u root -i inventory managenode-name --ask-pass -m raw -a 'yum install python3 -y'
+
+
+

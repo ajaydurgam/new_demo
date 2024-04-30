@@ -1,0 +1,20 @@
+import winrm
+
+def connect_to_windows_server(hostname, username, password):
+    try:
+        # Create a session
+        session = winrm.Session(
+            hostname, 
+            auth=(username, password),
+            server_cert_validation='ignore'  # Use 'ignore' for self-signed certificates)
+
+        # Run a PowerShell command (example: get the computer name)
+        encoded_ps = f"$env:COMPUTERNAME"
+        result = session.run_ps(encoded_ps)
+        print(result.std_out.decode('utf-8'))
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+# Example usage
+connect_to_windows_server('35.89.247.242', 'Administrator', '2xe.X6U2oZucHd73C)boIo=ArDep6.Zp')

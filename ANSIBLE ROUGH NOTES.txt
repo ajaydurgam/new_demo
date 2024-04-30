@@ -1,0 +1,215 @@
+                                      **********ANSIBLE ROUGH NOTES**************
+
+
+
+Ansible is agent less 
+
+
+agent less means we dont need to install anything on the target folder to connect with the master
+
+
+
+if we dont create any inventory file ansible uses default inventory file --> /etc/ansible/hosts
+
+
+
+private ip address ansible_host=server1.company.com (it defines the ip address of the target)
+
+ansible_connection=ssh --> it defines how master connects to the target folder
+
+ansible_port-22/596
+
+localhost ansible_connection=localhost
+
+ansible_ssh_pass-password
+
+
+
+================================================================================================================
+
+
+connection with master to Target is done by using --> ssh Private ip of target node
+
+
+if of one target node ping is successed but when pinging the another target its got failed 
+
+
+at that time open --> vi /etc/ansible/ansible.cfg 
+
+check for host_key_checking=False (uncomment it)
+
+Now its work 
+
+
+================================================================================================================
+
+
+
+                      **********YAML FILES**************
+
+
+Yaml file is used to represent configuration data
+
+
+Key Value data separated by ":"
+
+
+
+indentation should be clear in Yaml files
+
+
+Yaml file representations
+
+dictionary in another dictionary 
+
+lists
+
+
+In Yaml file dictionaries doesn't need order but in arraylist order must be same in yaml file
+
+
+
+==========================================================================================================================
+
+
+
+                                     ************Playbooks*************
+
+
+--> Run simple commands on target1 using master playbook
+
+--> resarting target1 also done using playbooks,...etc
+
+--> deploy 50 vm's on public cloud 
+
+--> provision storage to all vm's
+
+--> configuring web server to all ip's
+
+--> set up cluster configuration 
+
+
+these all and many more can be done using the playbooks.
+
+
+
+===> playbook --> is a single yamlfile 
+
+    
+     play --> defines set of activities (tasks) to be run on hosts(targets)
+
+
+      tasks --> 1.execute a command 
+
+                2.run a script 
+
+                3.install a package
+
+                4.shutdown/restart
+
+
+
+     
+playbook divided into two set of dictionaries 
+
+
+every dictinoary has a --> 1.name
+
+                           2.hosts
+
+                           3.tasks (it is in list form its a ordered collection)
+
+    
+
+modules are the different tasks done in yaml ex: command ,service ,yum ,shell
+
+
+
+if we have a file in master node  the by using the modules 
+
+
+==> ansible all -m ping(here ping is the module) -i(to specify inventory file)  inventory.txt
+
+we can connect it to the target nodes
+
+
+
+Playbook creation 
+
+
+--> vi playbook.yml
+
+        
+
+  - 
+     name: test connectivity to target server
+     hosts: all
+     tasks: 
+       - name: ping test
+         ping:
+
+
+esc:wq!(enter) to save file
+
+
+--> ansible-playbook playbook.yml -i inventory.txt
+
+
+
+                         ***********Modules***********
+
+System level modules 
+
+
+==> command modules--> used to execute commands 
+
+==> file--> modules used to copy replace many more 
+
+==> db--> modules used to add remove modify databases
+
+==> cloud--> modules have for amazon,docker, azure ,google,vmware manymore.
+
+==> windows--> modules used to operate in windows environment
+
+and have manymore modules 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
